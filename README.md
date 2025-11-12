@@ -1,105 +1,88 @@
-ColourSS
+# ColourSS
 
 A Rust library for parsing CSS color strings into RGB values.
 
 This project provides a library and a command-line tool to parse various
 CSS color formats (Hex, RGB, HSL, Named) into a simple RGB struct.
 
-Technical Description
+## Technical Description
 
-This library provides a single main function, parse_color(input: &str),
+This library provides a single main function, `parse_color(input: &str)`,
 which takes a string slice and attempts to parse it into a
-Color { r: u8, g: u8, b: u8 } struct.
+`Color { r: u8, g: u8, b: u8 }` struct.
 
 The parser works by trying to match the input string against a set of
 predefined grammar rules. It checks in this order:
 
-Hex
+1.  Hex
+2.  RGB/RGBA
+3.  HSL/HSLA
+4.  Named Color
 
-RGB/RGBA
-
-HSL/HSLA
-
-Named Color
-
-If a match is found, it processes the string and returns the Ok(Color).
+If a match is found, it processes the string and returns the `Ok(Color)`.
 If no rule matches, or if the format is invalid (e.g., wrong number of
-components, bad numbers), it returns an Err(ParseError).
+components, bad numbers), it returns an `Err(ParseError)`.
 
-Grammar Rules
+### Grammar Rules
 
 The parser understands the following formats:
-
 <color> ::= <hex-color> | <rgb-color> | <hsl-color> | <named-color>
+1.  **Hex:** `<hex-color> ::= '#__{3,4,6,8}__'`
 
+      * `#rgb` (e.g., `#f03`)
+      * `#rgba` (e.g., `#f03a`)
+      * `#rrggbb` (e.g., `#ff0033`)
+      * `#rrggbbaa` (e.g., `#ff0033aa`)
 
-Hex: <hex-color> ::= '#__{3,4,6,8}__'
+2.  **RGB(A):** `<rgb-color> ::= 'rgb(' <number> ',' <number> ',' <number> ')' | 'rgba(' ... ')'`
 
-#rgb (e.g., #f03)
+      * `rgb(255, 100, 0)`
+      * `rgba(255, 100, 0, 0.5)`
 
-#rgba (e.g., #f03a)
+3.  **HSL(A):** `<hsl-color> ::= 'hsl(' <hue> ',' <percent> ',' <percent> ')' | 'hsla(' ... ')'`
 
-#rrggbb (e.g., #ff0033)
+      * `hsl(120, 100%, 50%)`
+      * `hsla(120, 100%, 50%, 1.0)`
 
-#rrggbbaa (e.g., #ff0033aa)
+4.  **Named:** `<named-color> ::= 'red' | 'blue' | ...`
 
-RGB(A): <rgb-color> ::= 'rgb(' <number> ',' <number> ',' <number> ')' | 'rgba(' ... ')'
+      * `red`, `green`, `blue`, `white`, `black`, `yellow`, `rebeccapurple`
+      * This is case-insensitive.
 
-rgb(255, 100, 0)
+*(Note: For `rgba` and `hsla` formats, the alpha component is parsed
+to ensure the format is valid, but it is discarded in the final `Color`
+struct, as per the requirements.)*
 
-rgba(255, 100, 0, 0.5)
+### How to Use the Result
 
-HSL(A): <hsl-color> ::= 'hsl(' <hue> ',' <percent> ',' <percent> ')' | 'hsla(' ... ')'
+The resulting `Color` struct is a simple data container:
 
-hsl(120, 100%, 50%)
-
-hsla(120, 100%, 50%, 1.0)
-
-Named: <named-color> ::= 'red' | 'blue' | ...
-
-red, green, blue, white, black, yellow, rebeccapurple
-
-This is case-insensitive.
-
-(Note: For rgba and hsla formats, the alpha component is parsed
-to ensure the format is valid, but it is discarded in the final Color
-struct, as per the requirements.)
-
-How to Use the Result
-
-The resulting Color struct is a simple data container:
-
+```rust
 #[derive(Debug, PartialEq)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
     pub b: u8,
 }
+```
+This struct can be used by any Rust application that needs to work with colors, such as:
+* A game engine needing to set entity colors.
+* A terminal application that wants to style its output.
+* A web server templating engine that processes stylesheets.
 
-
-This struct can be used by any Rust application that needs to work
-with colors, such as:
-
-A game engine needing to set entity colors.
-
-A terminal application that wants to style its output.
-
-A web server templating engine that processes stylesheets.
-
-Command-Line Interface (CLI)
-
+### Command-Line Interface (CLI)
 This project also includes a CLI app.
+```rust
+cargo run --help
+```
 
-cargo run -- --help
-
-Commands
-
-cargo run -- parse <path/to/file.txt>
-This command will read the specified file and try to parse
-each line as a color. It will print the result for each line.
+### Commands:
+```rust
+cargo run --parse <path/to/file.txt>
+```
+This command will read the specified file and try to parse each line as a color. It will print the result for each line.
 
 Example colors.txt:
-
 #ff0000
 blue
 hsl(120, 100%, 50%)
@@ -107,5 +90,7 @@ not a color
 rgb(10, 20, 30)
 
 
-cargo run -- credits
+```rust
+cargo run --credits
+```
 Displays author and license information.

@@ -5,6 +5,21 @@ A Rust library for parsing CSS color strings into RGB values.
 This project provides a library and a command-line tool to parse various
 CSS color formats (Hex, RGB, HSL, Named) into a simple RGB struct.
 
+## Installation
+
+### From creates.io
+The package is published on creates.io
+```rust
+cargo install colourss
+```
+
+### From source
+```bash
+git clone https://github.com/tumelonito/ColourSS.git
+cd ColourSS
+cargo build --release
+```
+
 ## Technical Description
 
 This library provides a single main function, `parse_color(input: &str)`,

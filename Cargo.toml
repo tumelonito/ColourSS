@@ -1,0 +1,11 @@
+[package]
+name = "colourss"
+version = "0.1.0"
+edition = "2024"
+description = "A Rust library for parsing CSS color strings into RGB values."
+license = "MIT"
+
+[dependencies]
+thiserror = "1.0"
+clap = { version = "4.5.4", features = ["derive"] }
+anyhow = "1.0"

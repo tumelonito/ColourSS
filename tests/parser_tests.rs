@@ -53,6 +53,28 @@ fn test_rule2_rgb() {
         parse_color("  rgb( 0 , 255 , 0 )  ").unwrap(),
         Color { r: 0, g: 255, b: 0 }
     );
+
+    // New tests for space-separated and percentages
+    assert_eq!(
+        parse_color("rgb(255 0 0)").unwrap(), // spaces
+        Color { r: 255, g: 0, b: 0 }
+    );
+    assert_eq!(
+        parse_color("rgba(0 128 0 / 0.5)").unwrap(), // spaces + alpha
+        Color { r: 0, g: 128, b: 0 }
+    );
+    assert_eq!(
+        parse_color("rgb(100%, 0%, 0%)").unwrap(), // percentages
+        Color { r: 255, g: 0, b: 0 }
+    );
+    assert_eq!(
+        parse_color("rgb(0% 100% 0%)").unwrap(), // percentages + spaces
+        Color { r: 0, g: 255, b: 0 }
+    );
+    assert_eq!(
+        parse_color("rgba(0% 0% 100% / 1.0)").unwrap(), // percentages + spaces + alpha
+        Color { r: 0, g: 0, b: 255 }
+    );
 }
 
 #[test]
@@ -61,6 +83,8 @@ fn test_rule2_rgb_fail() {
     assert!(parse_color("rgb(255, 0, 0, 1, 5)").is_err()); // too many parts
     assert!(parse_color("rgb(256, 0, 0)").is_err()); // bad number
     assert!(parse_color("rgb(255, 0, 0").is_err()); // missing paren
+    assert!(parse_color("rgb(101%, 0%, 0%)").is_err()); // bad percentage
+    assert!(parse_color("rgb(255 0 0 0.5)").is_err()); // 4 parts in rgb() without slash
 }
 
 #[test]
@@ -84,6 +108,20 @@ fn test_rule3_hsl() {
     assert_eq!(
         parse_color("hsl(0, 0%, 0%)").unwrap(),
         Color { r: 0, g: 0, b: 0 }
+    );
+
+    // New tests for space-separated
+    assert_eq!(
+        parse_color("hsl(120 100% 50%)").unwrap(), // spaces
+        Color { r: 0, g: 255, b: 0 }
+    );
+    assert_eq!(
+        parse_color("hsla(0 100% 50% / 1.0)").unwrap(), // spaces + alpha
+        Color { r: 255, g: 0, b: 0 }
+    );
+    assert_eq!(
+        parse_color("hsl(240deg 100% 50%)").unwrap(), // 'deg' unit
+        Color { r: 0, g: 0, b: 255 }
     );
 }
 
@@ -118,12 +156,16 @@ fn test_rule4_named() {
             b: 153
         }
     );
+    // This was in fail test, but it's implemented
+    assert_eq!(
+        parse_color("orange").unwrap(),
+        Color { r: 255, g: 165, b: 0 }
+    );
 }
 
 #[test]
 fn test_rule4_named_fail() {
     // not in our small list
-    assert!(parse_color("orange").is_err());
     assert!(parse_color("notacolor").is_err());
 }
 
